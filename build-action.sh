@@ -111,7 +111,7 @@ git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --dep
 
 # Add date to local version
 local_version_str="-CLC"
-local_version_date_str="-$(date +%Y%m%d)-UMI-SKU-K-S-n43cpm1"
+local_version_date_str="-$(date +%Y%m%d)-UMI-SKU-K-S-slz39dnw"
 
 sed -i "s/${local_version_str}/${local_version_date_str}/g" arch/arm64/configs/${TARGET_DEVICE}_defconfig
 
