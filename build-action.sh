@@ -187,6 +187,7 @@ make $MAKE_ARGS ${TARGET_DEVICE}_defconfig
 if [ $KSU_ENABLE -eq 1 ]; then
     scripts/config --file out/.config \
     -e KSU \
+    -e KSU_SUSFS \
     -e KSU_MANUAL_HOOK \
     -e KSU_SUSFS_HAS_MAGIC_MOUNT \
     -e KSU_SUSFS_SUS_PATH \
@@ -202,7 +203,7 @@ if [ $KSU_ENABLE -eq 1 ]; then
     -e KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS \
     -e KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG \
     -e KSU_SUSFS_OPEN_REDIRECT \
-    -e KSU_SUSFS_SUS_SU \
+    -d KSU_SUSFS_SUS_SU \
     -e KPM \
     -e CMD_GET_SUSFS_FEATURE_STATUS
 else
