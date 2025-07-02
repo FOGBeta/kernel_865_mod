@@ -204,11 +204,7 @@ if [ $KSU_ENABLE -eq 1 ]; then
     -e KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG \
     -e KSU_SUSFS_OPEN_REDIRECT \
     -e KSU_SUSFS_SUS_SU \
-    -e KPM \
-    -e CMD_GET_SUSFS_FEATURE_STATUS \
-    -e CMD_SUSFS_HIDE_SUS_MNTS_FOR_ALL_PROCS \
-    -e CMD_SUSFS_SET_SDCARD_ROOT_PATH \
-    -e CMD_SUSFS_SET_ANDROID_DATA_ROOT_PATH
+    -e KPM 
 else
     scripts/config --file out/.config -d KSU
 fi
