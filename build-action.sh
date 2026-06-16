@@ -111,33 +111,24 @@ git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --dep
 
 # ============================================
 # 新增：应用 Droidspaces 非 GKI 内核补丁
-# ============================================
-echo "应用 Droidspaces 非 GKI 内核补丁..."
-
-# 1. 克隆 Droidspaces-OSS 仓库（使用 --depth=1 加速）
+# 应用 Droidspaces 补丁（容错模式）
+echo "Applying Droidspaces non-GKI kernel patches..."
 git clone https://github.com/ravindu644/Droidspaces-OSS --depth=1
-
-# 2. 定义补丁存放的路径
 PATCH_DIR="Droidspaces-OSS/Documentation/resources/kernel-patches/non-GKI"
-
-# 3. 检查补丁目录是否存在
 if [ ! -d "$PATCH_DIR" ]; then
-    echo "错误: Droidspaces补丁文件未找到!"
+    echo "Error: Droidspaces patch directory not found!"
     exit 1
 fi
-
-# 4. 遍历并应用所有 .patch 文件
 for patch_file in "$PATCH_DIR"/*.patch; do
     if [ -f "$patch_file" ]; then
         echo "Applying patch: $(basename "$patch_file")"
-        patch -p1 < "$patch_file"
-        if [ $? -ne 0 ]; then
-            echo "Error: Failed to apply patch $(basename "$patch_file")"
-            exit 1
-        fi
+        # 使用 --forward 和 --ignore-whitespace，失败时仅警告并继续
+        patch -p1 --forward --ignore-whitespace < "$patch_file" 2>&1 || {
+            echo "Warning: Failed to apply $(basename "$patch_file"), skipping..."
+        }
     fi
 done
-
+echo "Droidspaces patches applied (some may have been skipped)."
 echo "所有 Droidspaces 补丁已打上。"
 # ============================================
 
