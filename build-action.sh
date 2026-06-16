@@ -109,29 +109,6 @@ rm -rf anykernel/
 echo "Clone AnyKernel3 for packing kernel (repo: https://github.com/liyafe1997/AnyKernel3)"
 git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --depth=1 anykernel
 
-# ============================================
-# 新增：应用 Droidspaces 非 GKI 内核补丁
-# 应用 Droidspaces 补丁（容错模式）
-echo "Applying Droidspaces non-GKI kernel patches..."
-git clone https://github.com/ravindu644/Droidspaces-OSS --depth=1
-PATCH_DIR="Droidspaces-OSS/Documentation/resources/kernel-patches/non-GKI"
-if [ ! -d "$PATCH_DIR" ]; then
-    echo "Error: Droidspaces patch directory not found!"
-    exit 1
-fi
-for patch_file in "$PATCH_DIR"/*.patch; do
-    if [ -f "$patch_file" ]; then
-        echo "Applying patch: $(basename "$patch_file")"
-        # 使用 --forward 和 --ignore-whitespace，失败时仅警告并继续
-        patch -p1 --forward --ignore-whitespace < "$patch_file" 2>&1 || {
-            echo "Warning: Failed to apply $(basename "$patch_file"), skipping..."
-        }
-    fi
-done
-echo "Droidspaces patches applied (some may have been skipped)."
-echo "所有 Droidspaces 补丁已打上。"
-# ============================================
-
 # Add date to local version
 local_version_str="-CLC"
 local_version_date_str="-$(date +%Y%m%d)-UMI-SKU-K-S-zw691aq"
@@ -334,7 +311,7 @@ mkdir -p anykernel/kernels/
 # Patch for SukiSU KPM support. 
 if [ $KSU_ENABLE -eq 1 ]; then
     cd out/arch/arm64/boot/
-    wget https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/download/0.12.0/patch_linux
+    wget https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/download/0.13.0/patch_linux
     chmod +x patch_linux
     ./patch_linux
     rm Image
