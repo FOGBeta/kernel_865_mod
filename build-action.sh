@@ -109,6 +109,38 @@ rm -rf anykernel/
 echo "Clone AnyKernel3 for packing kernel (repo: https://github.com/liyafe1997/AnyKernel3)"
 git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --depth=1 anykernel
 
+# ============================================
+# 新增：应用 Droidspaces 非 GKI 内核补丁
+# ============================================
+echo "应用 Droidspaces 非 GKI 内核补丁..."
+
+# 1. 克隆 Droidspaces-OSS 仓库（使用 --depth=1 加速）
+git clone https://github.com/ravindu644/Droidspaces-OSS --depth=1
+
+# 2. 定义补丁存放的路径
+PATCH_DIR="Droidspaces-OSS/Documentation/resources/kernel-patches/non-GKI"
+
+# 3. 检查补丁目录是否存在
+if [ ! -d "$PATCH_DIR" ]; then
+    echo "错误: Droidspaces补丁文件未找到!"
+    exit 1
+fi
+
+# 4. 遍历并应用所有 .patch 文件
+for patch_file in "$PATCH_DIR"/*.patch; do
+    if [ -f "$patch_file" ]; then
+        echo "Applying patch: $(basename "$patch_file")"
+        patch -p1 < "$patch_file"
+        if [ $? -ne 0 ]; then
+            echo "Error: Failed to apply patch $(basename "$patch_file")"
+            exit 1
+        fi
+    fi
+done
+
+echo "所有 Droidspaces 补丁已打上。"
+# ============================================
+
 # Add date to local version
 local_version_str="-CLC"
 local_version_date_str="-$(date +%Y%m%d)-UMI-SKU-K-S-zw691aq"
@@ -121,7 +153,7 @@ sed -i "s/${local_version_str}/${local_version_date_str}/g" arch/arm64/configs/$
 # ------------- Building for MIUI -------------
 
 
-echo "Clearning [out/] and build for MIUI....."
+echo "清理 [out/] 和 build for MIUI....."
 
 dts_source=arch/arm64/boot/dts/vendor/qcom
 
@@ -238,6 +270,53 @@ scripts/config --file out/.config \
     -e BOOTUP_RECLAIM \
     -e MI_RECLAIM \
     -e RTMM \
+    \
+    -e SYSCTL \
+    -e SYSVIPC \
+    -e POSIX_MQUEUE \
+    -e NAMESPACES \
+    -e PID_NS \
+    -e UTS_NS \
+    -e IPC_NS \
+    -e SECCOMP \
+    -e SECCOMP_FILTER \
+    -e CGROUPS \
+    -e CGROUP_DEVICE \
+    -e CGROUP_PIDS \
+    -e MEMCG \
+    -e CGROUP_SCHED \
+    -e FAIR_GROUP_SCHED \
+    -e CGROUP_FREEZER \
+    -e CGROUP_NET_PRIO \
+    -e DEVTMPFS \
+    -e TMPFS_POSIX_ACL \
+    -e TMPFS_XATTR \
+    -e FW_LOADER \
+    -e FW_LOADER_USER_HELPER \
+    -e FW_LOADER_COMPRESS \
+    -e NET_NS \
+    -e VETH \
+    -e BRIDGE \
+    -e NETFILTER \
+    -e BRIDGE_NETFILTER \
+    -e NETFILTER_ADVANCED \
+    -e NF_CONNTRACK \
+    -e IP_NF_IPTABLES \
+    -e IP_NF_FILTER \
+    -e NF_NAT \
+    -e NF_TABLES \
+    -e IP_NF_TARGET_MASQUERADE \
+    -e NETFILTER_XT_TARGET_MASQUERADE \
+    -e NETFILTER_XT_TARGET_TCPMSS \
+    -e NETFILTER_XT_MATCH_ADDRTYPE \
+    -e NF_CONNTRACK_NETLINK \
+    -e NF_NAT_REDIRECT \
+    -e IP_ADVANCED_ROUTER \
+    -e IP_MULTIPLE_TABLES \
+    -e NF_CONNTRACK_IPV4 \
+    -e NF_NAT_IPV4 \
+    -e IP_NF_NAT \
+    -d ANDROID_PARANOID_NETWORK
 
 make $MAKE_ARGS -j$(nproc)
 
